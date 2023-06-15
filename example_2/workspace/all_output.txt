@@ -1,0 +1,94 @@
+Sure, here's an example implementation of the program you described:
+
+## Core Classes, Functions, and Methods
+
+### `FileParser` class
+
+This class is responsible for parsing the input .txt file and extracting the Python code and file names.
+
+- `__init__(self, input_file_path: str)` - Initializes the `FileParser` object with the path to the input .txt file.
+- `parse(self) -> List[Tuple[str, str]]` - Parses the input .txt file and returns a list of tuples, where each tuple contains the Python code and file name.
+
+### `FileWriter` class
+
+This class is responsible for writing the Python code to separate .py files.
+
+- `__init__(self, output_dir_path: str)` - Initializes the `FileWriter` object with the path to the output directory where the .py files will be written.
+- `write_file(self, file_name: str, file_contents: str)` - Writes the given `file_contents` to a file with the given `file_name` in the output directory.
+
+### `main` function
+
+This function is the entry point of the program and orchestrates the parsing and writing of the Python code.
+
+- `main(input_file_path: str, output_dir_path: str)` - Parses the input .txt file using a `FileParser` object, and writes the Python code to separate .py files using a `FileWriter` object.
+
+## File Contents
+
+### `file_parser.py`
+
+```python
+from typing import List, Tuple
+
+
+class FileParser:
+    def __init__(self, input_file_path: str):
+        self.input_file_path = input_file_path
+
+    def parse(self) -> List[Tuple[str, str]]:
+        with open(self.input_file_path, 'r') as f:
+            lines = f.readlines()
+
+        file_contents = []
+        current_file_contents = []
+        current_file_name = None
+
+        for line in lines:
+            if line.startswith('#'):
+                if current_file_name is not None:
+                    file_contents.append((current_file_name, ''.join(current_file_contents)))
+                    current_file_contents = []
+                current_file_name = line.strip()[1:].strip() + '.py'
+            else:
+                current_file_contents.append(line)
+
+        if current_file_name is not None:
+            file_contents.append((current_file_name, ''.join(current_file_contents)))
+
+        return file_contents
+```
+
+### `file_writer.py`
+
+```python
+import os
+
+
+class FileWriter:
+    def __init__(self, output_dir_path: str):
+        self.output_dir_path = output_dir_path
+
+    def write_file(self, file_name: str, file_contents: str):
+        file_path = os.path.join(self.output_dir_path, file_name)
+        with open(file_path, 'w') as f:
+            f.write(file_contents)
+```
+
+### `main.py`
+
+```python
+from typing import List, Tuple
+from file_parser import FileParser
+from file_writer import FileWriter
+
+
+def main(input_file_path: str, output_dir_path: str):
+    file_parser = FileParser(input_file_path)
+    file_writer = FileWriter(output_dir_path)
+
+    file_contents = file_parser.parse()
+
+    for file_name, contents in file_contents:
+        file_writer.write_file(file_name, contents)
+```
+
+This implementation assumes that the input .txt file has the same format as the example you provided, where each Python script is preceded by a comment with the file name. The program reads the input file line by line, and whenever it encounters a comment line, it assumes that the following lines contain Python code for a new file. It then writes the Python code to a separate .py file with the specified file name in the output directory.

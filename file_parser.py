@@ -32,8 +32,8 @@ class FileParser:
             List of tuples, where each tuple contains a file name and its associated code block.
         """
         # Use regex to find the python code blocks and associated file names
-        code_blocks = re.findall(r'```python(.*?)```', content, re.DOTALL)
-        file_names = re.findall(r'(\w+)\.py', content)
+        file_names = re.findall(r"\b(?:[0-9]+\B)?([a-zA-Z_]\w*\.py)\b", chat)
+        code_blocks = re.findall(r'```(?:\w+\.py|python)?(.*?)```', chat, re.DOTALL)
 
         # Add comments to the top of each python file
         comments = '# This code was automatically generated from a text file.'
